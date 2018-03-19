@@ -6,7 +6,6 @@
 
 import requests
 import sys
-from datetime import datetime
 import time
 
 headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
@@ -25,8 +24,10 @@ def scratch():
 def get_route_id(route_name):
 	# gets the route ID based on the requested bus route.
 	routes = requests.get(base + 'Routes', headers=headers).json()
+	# print(routes)
 	for route in routes:
 		if route_name in route['Description']:
+			print(route)
 			return route['Route']
 
 def get_stop_id(route_id, stop_name, direction):
@@ -35,6 +36,7 @@ def get_stop_id(route_id, stop_name, direction):
 	# directions = {'south':'1', 'east':'2', 'west':'3', 'north':'4'}
 	# direction = directions[direction]
 	stops = requests.get(base + 'Stops/' + route_id + '/' + direction, headers=headers).json()
+	print(stops)
 	for stop in stops:
 		if stop_name in stop['Text']:
 			return stop['Value']
@@ -61,8 +63,11 @@ def main():
     directions = {'south':'1', 'east':'2', 'west':'3', 'north':'4'}
     direction_id = directions[direction]
     route_id = get_route_id(bus_route)
+    print('Route ID:', route_id)
     stop_id = get_stop_id(route_id, bus_stop_name, direction_id)
+    print('Stop ID:', stop_id)
     next_departure = get_next_departure(route_id, direction_id, stop_id)
+    print(next_departure)
     print(time_remaining(next_departure), 'minutes')
 
 
