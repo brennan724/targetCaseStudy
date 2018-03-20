@@ -11,57 +11,44 @@ import time
 headers = {'Content-Type': 'application/json', 'Accept': 'application/json'}
 base = 'http://svc.metrotransit.org/NexTrip/'
 
-def scratch():
-	# providers = requests.get(base + 'Providers', headers=headers)
-	# print(providers.text)
-	# print()
-	# routes = requests.get(base + 'Routes', headers=headers)
-	# print(routes.json())
-	# print()
-	directions = requests.get(base + 'Directions/901', headers=headers)
-	print(directions.text)
-
 def get_route_id(route_name):
-	# gets the route ID based on the requested bus route.
-	routes = requests.get(base + 'Routes', headers=headers).json()
-	# print(routes)
-	for route in routes:
-		if route_name in route['Description']:
-			print(route)
-			return route['Route']
-    # print('There are no routes with this name')
-    # sys.exit()
+    # gets the route ID based on the requested bus route.
+    routes = requests.get(base + 'Routes', headers=headers).json()
+    # print(routes)
+    for route in routes:
+        if route_name in route['Description']:
+            print(route)
+            return route['Route']
+    print('There are no routes with this name')
+    sys.exit()
 
 def get_stop_id(route_id, stop_name, direction):
-	# gets the ID of the stop we are at.  needs the route because we need the list of stops
-	# for the route to compare against to find our stop.
-	# directions = {'south':'1', 'east':'2', 'west':'3', 'north':'4'}
-	# direction = directions[direction]
-	stops = requests.get(base + 'Stops/' + route_id + '/' + direction, headers=headers).json()
-	print(stops)
-	for stop in stops:
-		if stop_name in stop['Text']:
-			return stop['Value']
+    # gets the ID of the stop we are at.  needs the route because we need the list of stops
+    # for the route to compare against to find our stop.
+    # directions = {'south':'1', 'east':'2', 'west':'3', 'north':'4'}
+    # direction = directions[direction]
+    stops = requests.get(base + 'Stops/' + route_id + '/' + direction, headers=headers).json()
+    print(stops)
+    for stop in stops:
+        if stop_name in stop['Text']:
+            return stop['Value']
     print('There are no stops with this name')
     sys.exit()
 
 def get_next_departure(route_id, direction_id, stop_id):
-	departures = requests.get(base + route_id + '/' + direction_id + '/' + stop_id, headers=headers).json()
+    departures = requests.get(base + route_id + '/' + direction_id + '/' + stop_id, headers=headers).json()
     if len(departures) > 0:
-	    return departures[0]
+        return departures[0]
     print('There are no scheduled departures from this stop')
     sys.exit()
-	# print(len(departures))
-	# for departure in departures:
-	# 	print(departure['DepartureTime'])
 
 def time_remaining(next_departure):
-	departure_time_unix = (int(next_departure['DepartureTime'][6:-7]) / 1000)
-	# print(departure_time_unix)
-	current_time = time.time()
-	# print(current_time)
-	remaining_seconds = departure_time_unix - current_time
-	return remaining_seconds / 60
+    departure_time_unix = (int(next_departure['DepartureTime'][6:-7]) / 1000)
+    # print(departure_time_unix)
+    current_time = time.time()
+    # print(current_time)
+    remaining_seconds = departure_time_unix - current_time
+    return remaining_seconds / 60
 
 def main():
     bus_route = sys.argv[1]
