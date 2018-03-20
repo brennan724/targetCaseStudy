@@ -29,6 +29,8 @@ def get_route_id(route_name):
 		if route_name in route['Description']:
 			print(route)
 			return route['Route']
+    # print('There are no routes with this name')
+    # sys.exit()
 
 def get_stop_id(route_id, stop_name, direction):
 	# gets the ID of the stop we are at.  needs the route because we need the list of stops
@@ -40,10 +42,15 @@ def get_stop_id(route_id, stop_name, direction):
 	for stop in stops:
 		if stop_name in stop['Text']:
 			return stop['Value']
+    print('There are no stops with this name')
+    sys.exit()
 
 def get_next_departure(route_id, direction_id, stop_id):
 	departures = requests.get(base + route_id + '/' + direction_id + '/' + stop_id, headers=headers).json()
-	return departures[0]
+    if len(departures) > 0:
+	    return departures[0]
+    print('There are no scheduled departures from this stop')
+    sys.exit()
 	# print(len(departures))
 	# for departure in departures:
 	# 	print(departure['DepartureTime'])
