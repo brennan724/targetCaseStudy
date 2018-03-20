@@ -14,10 +14,8 @@ base = 'http://svc.metrotransit.org/NexTrip/'
 def get_route_id(route_name):
     # gets the route ID based on the requested bus route.
     routes = requests.get(base + 'Routes', headers=headers).json()
-    # print(routes)
     for route in routes:
         if route_name in route['Description']:
-            print(route)
             return route['Route']
     print('There are no routes with this name')
     sys.exit()
@@ -28,7 +26,6 @@ def get_stop_id(route_id, stop_name, direction):
     # directions = {'south':'1', 'east':'2', 'west':'3', 'north':'4'}
     # direction = directions[direction]
     stops = requests.get(base + 'Stops/' + route_id + '/' + direction, headers=headers).json()
-    print(stops)
     for stop in stops:
         if stop_name in stop['Text']:
             return stop['Value']
@@ -44,11 +41,9 @@ def get_next_departure(route_id, direction_id, stop_id):
 
 def time_remaining(next_departure):
     departure_time_unix = (int(next_departure['DepartureTime'][6:-7]) / 1000)
-    # print(departure_time_unix)
     current_time = time.time()
-    # print(current_time)
     remaining_seconds = departure_time_unix - current_time
-    return remaining_seconds / 60
+    return round(remaining_seconds / 60, 2)
 
 def main():
     bus_route = sys.argv[1]
@@ -57,11 +52,8 @@ def main():
     directions = {'south':'1', 'east':'2', 'west':'3', 'north':'4'}
     direction_id = directions[direction]
     route_id = get_route_id(bus_route)
-    print('Route ID:', route_id)
     stop_id = get_stop_id(route_id, bus_stop_name, direction_id)
-    print('Stop ID:', stop_id)
     next_departure = get_next_departure(route_id, direction_id, stop_id)
-    print(next_departure)
     print(time_remaining(next_departure), 'minutes')
 
 
